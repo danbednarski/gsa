@@ -1,5 +1,5 @@
 import path from 'path';
-import {defineConfig} from 'vite';
+import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import legacy from '@vitejs/plugin-legacy';
 import svgrPlugin from 'vite-plugin-svgr';
@@ -7,16 +7,19 @@ import eslintPlugin from 'vite-plugin-eslint2';
 
 const projectRootDir = path.resolve(__dirname);
 
-// https://vitejs.dev/config/
 export default defineConfig({
+  // Serve the app under a subpath (must end with a trailing slash)
+  base: '/gvm_elmorecoalf1/',
+
   define: {
     global: 'window',
     // avoid "You are loading @emotion/react when it is already loaded" warnings during tests
     // https://github.com/emotion-js/emotion/discussions/2795#discussioncomment-7885638
     vi: {},
   },
+
   plugins: [
-    react({include: /\.(mdx|js|jsx|ts|tsx)$/}),
+    react({ include: /\.(mdx|js|jsx|ts|tsx)$/ }),
     legacy(),
     svgrPlugin({
       svgrOptions: {
@@ -27,6 +30,7 @@ export default defineConfig({
     }),
     eslintPlugin(),
   ],
+
   resolve: {
     alias: [
       {
@@ -47,6 +51,7 @@ export default defineConfig({
       },
     ],
   },
+
   server: {
     port: 8080,
     host: '127.0.0.1',
@@ -55,6 +60,7 @@ export default defineConfig({
       allow: ['index.html', 'src', 'node_modules'],
     },
   },
+
   build: {
     outDir: 'build',
     minify: 'terser',
@@ -70,3 +76,4 @@ export default defineConfig({
     },
   },
 });
+
