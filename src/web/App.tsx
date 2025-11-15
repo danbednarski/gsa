@@ -41,18 +41,15 @@ const store = configureStore({
 window.gmp = gmp;
 
 const initStore = () => {
-  const {timezone} = gmp.settings;
-
-  // Auto-login as admin user (authentication disabled)
-  gmp.settings.username = 'admin';
-  gmp.settings.token = 'dummy-token'; // Required for isLoggedIn() to return true
+  const {timezone, username} = gmp.settings;
 
   if (isDefined(timezone)) {
     store.dispatch(setTimezone(timezone));
   }
-  
-  store.dispatch(setUsername('admin'));
-  store.dispatch(setIsLoggedIn(true));
+  if (isDefined(username)) {
+    store.dispatch(setUsername(username));
+  }
+  store.dispatch(setIsLoggedIn(gmp.isLoggedIn()));
 };
 
 class App extends React.Component<{}> {
