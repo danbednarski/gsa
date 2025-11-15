@@ -23,6 +23,7 @@ import {
   setUsername,
   setTimezone,
   setIsLoggedIn,
+  setSessionTimeout,
 } from 'web/store/usersettings/actions';
 
 void initLocale();
@@ -40,31 +41,56 @@ const store = configureStore({
 // @ts-expect-error
 window.gmp = gmp;
 
-const initStore = () => {
-  const {timezone, username} = gmp.settings;
+const initStore = async () => {
+  // Auto-login as admin if not already logged in
+  if (!gmp.isLoggedIn()) {
+    try {
+      const data = await gmp.login('admin', '吃错药了');
+      const {locale, timezone, sessionTimeout} = data;
 
-  if (isDefined(timezone)) {
-    store.dispatch(setTimezone(timezone));
+      gmp.setTimezone(timezone);
+      gmp.setLocale(locale);
+      store.dispatch(setSessionTimeout(sessionTimeout));
+      store.dispatch(setUsername('admin'));
+      store.dispatch(setTimezone(timezone));
+      store.dispatch(setIsLoggedIn(true));
+    } catch (error) {
+      console.error('Auto-login failed:', error);
+      // Still set logged in state to avoid redirect loops
+      store.dispatch(setIsLoggedIn(false));
+    }
+  } else {
+    // User already logged in, just sync the store
+    const {timezone, username} = gmp.settings;
+
+    if (isDefined(timezone)) {
+      store.dispatch(setTimezone(timezone));
+    }
+    if (isDefined(username)) {
+      store.dispatch(setUsername(username));
+    }
+    store.dispatch(setIsLoggedIn(true));
   }
-  if (isDefined(username)) {
-    store.dispatch(setUsername(username));
-  }
-  store.dispatch(setIsLoggedIn(gmp.isLoggedIn()));
 };
 
-class App extends React.Component<{}> {
+class App extends React.Component<{}, {isInitializing: boolean}> {
   private unsubscribeFromLogout!: () => void;
 
   constructor(props: {}) {
     super(props);
 
+    this.state = {
+      isInitializing: true,
+    };
+
     this.handleLogout = this.handleLogout.bind(this);
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.unsubscribeFromLogout = gmp.subscribeToLogout(this.handleLogout);
 
-    initStore();
+    await initStore();
+    this.setState({isInitializing: false});
   }
 
   componentWillUnmount() {
@@ -79,6 +105,8 @@ class App extends React.Component<{}> {
   }
 
   render() {
+    const {isInitializing} = this.state;
+
     return (
       <ThemeProvider defaultColorScheme="light">
         <GlobalStyles />
@@ -87,7 +115,7 @@ class App extends React.Component<{}> {
             <QueryClientProvider client={queryClient}>
               <StoreProvider store={store}>
                 <LanguageProvider>
-                  <Routes />
+                  {isInitializing ? null : <Routes />}
                 </LanguageProvider>
               </StoreProvider>
             </QueryClientProvider>
