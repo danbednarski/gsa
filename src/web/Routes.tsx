@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-import {useState, useEffect} from 'react';
-import {useSelector} from 'react-redux';
 import {
   HashRouter as Router,
   Routes,
@@ -13,7 +11,6 @@ import {
   useLocation,
 } from 'react-router';
 import Authorized from 'web/Authorized';
-import Loading from 'web/components/loading/Loading';
 import SessionObserver from 'web/components/observer/SessionObserver';
 import SessionTracker from 'web/components/observer/SessionTracker';
 import AgentGroupsListPage from 'web/pages/agent-groups/AgentGroupsListPage';
@@ -100,7 +97,6 @@ import UserSettingsPage from 'web/pages/user-settings/UserSettingsPage';
 import UserDetailsPage from 'web/pages/users/DetailsPage';
 import UsersPage from 'web/pages/users/ListPage';
 import VulnerabilitiesPage from 'web/pages/vulns/ListPage';
-import {isLoggedIn as selectIsLoggedIn} from 'web/store/usersettings/selectors';
 
 const LoggedOutRoutes = () => {
   const location = useLocation();
@@ -245,21 +241,11 @@ const LoggedInRoutes = () => {
 };
 
 const AppRoutes = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const isLoggedIn = useSelector(selectIsLoggedIn);
-
-  useEffect(() => {
-    if (isLoggedIn !== undefined) {
-      setIsLoading(false);
-    }
-  }, [isLoggedIn]);
-
-  if (isLoading) {
-    return <Loading />;
-  }
-
+  // Authentication check removed - always show LoggedInRoutes
   return (
-    <Router>{isLoggedIn ? <LoggedInRoutes /> : <LoggedOutRoutes />}</Router>
+    <Router>
+      <LoggedInRoutes />
+    </Router>
   );
 };
 
