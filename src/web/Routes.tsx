@@ -119,8 +119,8 @@ const LoggedOutRoutes = () => {
 const LoggedInRoutes = () => {
   return (
     <Authorized>
-      <SessionTracker />
-      <SessionObserver />
+      {/* <SessionTracker /> */}
+      {/* <SessionObserver /> */}
       <Page>
         <Routes>
           <Route element={<StartPage />} path="/dashboards" />

@@ -65,25 +65,8 @@ const LoginPage: React.FC = () => {
   const dispatch = useDispatch();
   const [isLoggedIn] = useUserIsLoggedIn();
   const [error, setError] = useState<Error>();
+  const [hasAttemptedAutoLogin, setHasAttemptedAutoLogin] = useState(false);
   const [_] = useTranslation();
-
-  useEffect(() => {
-    const checkLoginStatus = async () => {
-      // redirect user to main page if he is already logged in
-
-      if (isLoggedIn) {
-        try {
-          await navigate('/dashboards', {replace: true});
-        } catch (error) {
-          log.error(error);
-        }
-      }
-    };
-
-    void checkLoginStatus();
-
-    notifications.clean();
-  }, [isLoggedIn, navigate]);
 
   const login = async (username: string, password: string) => {
     try {
@@ -143,6 +126,27 @@ const LoginPage: React.FC = () => {
       gmp.settings.guestPassword ?? 'guest',
     );
   };
+
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      // redirect user to main page if he is already logged in
+      if (isLoggedIn) {
+        try {
+          await navigate('/dashboards', {replace: true});
+        } catch (error) {
+          log.error(error);
+        }
+      } else if (!hasAttemptedAutoLogin) {
+        // Auto-login when accessing login page (only attempt once)
+        setHasAttemptedAutoLogin(true);
+        await handleGuestLogin();
+      }
+    };
+
+    void checkLoginStatus();
+
+    notifications.clean();
+  }, [isLoggedIn, navigate, hasAttemptedAutoLogin]);
 
   let message: string | undefined;
 
