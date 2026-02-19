@@ -119,7 +119,7 @@ const LoggedOutRoutes = () => {
 const LoggedInRoutes = () => {
   return (
     <Authorized>
-      {/* <SessionTracker /> */}
+      <SessionTracker />
       {/* <SessionObserver /> */}
       <Page>
         <Routes>

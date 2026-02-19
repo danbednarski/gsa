@@ -44,7 +44,7 @@ class Ping extends React.Component {
   startTimer() {
     const {sessionTimeout} = this.props;
 
-    const timeout = sessionTimeout.diff(moment()) + DELAY;
+    const timeout = sessionTimeout.diff(moment()) - DELAY;
 
     if (timeout > 0) {
       this.timer = global.setTimeout(this.handlePing, timeout);
