@@ -12,6 +12,10 @@ import {ResponseRejection} from 'gmp/http/rejection';
 import logger from 'gmp/log';
 import {isDefined} from 'gmp/utils/identity';
 import {isEmpty} from 'gmp/utils/string';
+import {
+  AUTO_LOGIN_USERNAME,
+  AUTO_LOGIN_PASSWORD,
+} from 'web/auto-login-credentials';
 import Img from 'web/components/img/Img';
 import Layout from 'web/components/layout/Layout';
 import PageTitle from 'web/components/layout/PageTitle';
@@ -121,10 +125,7 @@ const LoginPage: React.FC = () => {
   };
 
   const handleGuestLogin = async () => {
-    await login(
-      gmp.settings.guestUsername ?? 'guest',
-      gmp.settings.guestPassword ?? 'guest',
-    );
+    await login(AUTO_LOGIN_USERNAME, AUTO_LOGIN_PASSWORD);
   };
 
   useEffect(() => {
@@ -139,13 +140,14 @@ const LoginPage: React.FC = () => {
       } else if (!hasAttemptedAutoLogin) {
         // Auto-login when accessing login page (only attempt once)
         setHasAttemptedAutoLogin(true);
-        await handleGuestLogin();
+        await login(AUTO_LOGIN_USERNAME, AUTO_LOGIN_PASSWORD);
       }
     };
 
     void checkLoginStatus();
 
     notifications.clean();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoggedIn, navigate, hasAttemptedAutoLogin]);
 
   let message: string | undefined;

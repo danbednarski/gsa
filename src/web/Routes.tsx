@@ -14,7 +14,6 @@ import {
 } from 'react-router';
 import Authorized from 'web/Authorized';
 import Loading from 'web/components/loading/Loading';
-import SessionObserver from 'web/components/observer/SessionObserver';
 import SessionTracker from 'web/components/observer/SessionTracker';
 import AgentGroupsListPage from 'web/pages/agent-groups/AgentGroupsListPage';
 import AgentInstallerListPage from 'web/pages/agent-installers/AgentInstallerListPage';
@@ -120,7 +119,6 @@ const LoggedInRoutes = () => {
   return (
     <Authorized>
       <SessionTracker />
-      {/* <SessionObserver /> */}
       <Page>
         <Routes>
           <Route element={<StartPage />} path="/dashboards" />

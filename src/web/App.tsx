@@ -12,6 +12,10 @@ import {_, initLocale} from 'gmp/locale/lang';
 import {LOG_LEVEL_DEBUG} from 'gmp/log';
 import Settings from 'gmp/settings';
 import {isDefined} from 'gmp/utils/identity';
+import {
+  AUTO_LOGIN_USERNAME,
+  AUTO_LOGIN_PASSWORD,
+} from 'web/auto-login-credentials';
 import ErrorBoundary from 'web/components/error/ErrorBoundary';
 import GlobalStyles from 'web/components/layout/GlobalStyles';
 import GmpContext from 'web/components/provider/GmpProvider';
@@ -45,13 +49,13 @@ const initStore = async () => {
   // Auto-login as admin if not already logged in
   if (!gmp.isLoggedIn()) {
     try {
-      const data = await gmp.login('admin', '吃错药了');
+      const data = await gmp.login(AUTO_LOGIN_USERNAME, AUTO_LOGIN_PASSWORD);
       const {locale, timezone, sessionTimeout} = data;
 
       gmp.setTimezone(timezone);
       gmp.setLocale(locale);
       store.dispatch(setSessionTimeout(sessionTimeout));
-      store.dispatch(setUsername('admin'));
+      store.dispatch(setUsername(AUTO_LOGIN_USERNAME));
       store.dispatch(setTimezone(timezone));
       store.dispatch(setIsLoggedIn(true));
     } catch (error) {
