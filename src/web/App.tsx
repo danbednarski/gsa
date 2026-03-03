@@ -12,6 +12,10 @@ import {_, initLocale} from 'gmp/locale/lang';
 import {LOG_LEVEL_DEBUG} from 'gmp/log';
 import Settings from 'gmp/settings';
 import {isDefined} from 'gmp/utils/identity';
+import {
+  AUTO_LOGIN_USERNAME,
+  AUTO_LOGIN_PASSWORD,
+} from 'web/auto-login-credentials';
 import ErrorBoundary from 'web/components/error/ErrorBoundary';
 import GlobalStyles from 'web/components/layout/GlobalStyles';
 import GmpContext from 'web/components/provider/GmpProvider';
@@ -25,7 +29,6 @@ import {
   setIsLoggedIn,
   setSessionTimeout,
 } from 'web/store/usersettings/actions';
-import {AUTO_LOGIN_USERNAME, AUTO_LOGIN_PASSWORD} from 'web/autoLoginCredentials';
 
 void initLocale();
 const queryClient = new QueryClient();

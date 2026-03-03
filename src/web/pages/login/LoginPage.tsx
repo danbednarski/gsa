@@ -12,6 +12,10 @@ import {ResponseRejection} from 'gmp/http/rejection';
 import logger from 'gmp/log';
 import {isDefined} from 'gmp/utils/identity';
 import {isEmpty} from 'gmp/utils/string';
+import {
+  AUTO_LOGIN_USERNAME,
+  AUTO_LOGIN_PASSWORD,
+} from 'web/auto-login-credentials';
 import Img from 'web/components/img/Img';
 import Layout from 'web/components/layout/Layout';
 import PageTitle from 'web/components/layout/PageTitle';
@@ -26,7 +30,6 @@ import {
   setIsLoggedIn,
   setTimezone,
 } from 'web/store/usersettings/actions';
-import {AUTO_LOGIN_USERNAME, AUTO_LOGIN_PASSWORD} from 'web/autoLoginCredentials';
 import Theme from 'web/utils/Theme';
 
 const log = logger.getLogger('web.login');
