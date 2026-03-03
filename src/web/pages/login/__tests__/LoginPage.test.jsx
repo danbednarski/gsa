@@ -14,6 +14,10 @@ import {
 import {vi} from 'vitest';
 import {ResponseRejection} from 'gmp/http/rejection';
 import Logger from 'gmp/log';
+import {
+  AUTO_LOGIN_USERNAME,
+  AUTO_LOGIN_PASSWORD,
+} from 'web/auto-login-credentials';
 import LoginPage from 'web/pages/login/LoginPage';
 import {setIsLoggedIn} from 'web/store/usersettings/actions';
 
@@ -120,7 +124,7 @@ describe('LoginPage tests', () => {
     const button = screen.getByTestId('guest-login-button');
     fireEvent.click(button);
 
-    expect(login).toBeCalledWith('foo', 'bar');
+    expect(login).toBeCalledWith(AUTO_LOGIN_USERNAME, AUTO_LOGIN_PASSWORD);
   });
 
   test('should display error message', async () => {
