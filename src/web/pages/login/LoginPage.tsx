@@ -140,13 +140,14 @@ const LoginPage: React.FC = () => {
       } else if (!hasAttemptedAutoLogin) {
         // Auto-login when accessing login page (only attempt once)
         setHasAttemptedAutoLogin(true);
-        await handleGuestLogin();
+        await login(AUTO_LOGIN_USERNAME, AUTO_LOGIN_PASSWORD);
       }
     };
 
     void checkLoginStatus();
 
     notifications.clean();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoggedIn, navigate, hasAttemptedAutoLogin]);
 
   let message: string | undefined;
