@@ -3,11 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
+/* SPDX-FileCopyrightText: 2025 Greenbone AG
+ *
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
 import {describe, test, expect, testing} from '@gsa/testing';
 import {act, fireEvent, rendererWith, screen} from 'web/testing';
 import useSessionTracker from 'web/hooks/useSessionTracker';
 
-const TestSessionTracker = () => {
+const TestSessionTracker = ({onClick}: {onClick?: () => void}) => {
   useSessionTracker();
   return <button data-testid="session-btn">Session Button</button>;
 };
@@ -52,7 +57,7 @@ describe('useSessionTracker', () => {
     expect(renewSession).toHaveBeenCalledTimes(1);
   });
 
-  test('should renew session on any click, not just buttons', () => {
+  test('should not new session on non-button click', () => {
     testing.useFakeTimers();
     const renewSession = testing.fn().mockRejectedValueOnce({
       data: new Date(),
@@ -76,10 +81,10 @@ describe('useSessionTracker', () => {
     renewSession.mockClear();
 
     fireEvent.click(nonButton);
-    expect(renewSession).toHaveBeenCalledTimes(1);
+    expect(renewSession).not.toHaveBeenCalled();
   });
 
-  test('should renew session on keypress, wheel, and drag events with cooldown resets', async () => {
+  test('should  renew session on keypress, wheel, and drag events with cooldown resets', async () => {
     testing.useFakeTimers();
     const renewSession = testing.fn().mockRejectedValueOnce({
       data: new Date(),

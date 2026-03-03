@@ -26,6 +26,7 @@ import {
   setIsLoggedIn,
   setTimezone,
 } from 'web/store/usersettings/actions';
+import {AUTO_LOGIN_USERNAME, AUTO_LOGIN_PASSWORD} from 'web/autoLoginCredentials';
 import Theme from 'web/utils/Theme';
 
 const log = logger.getLogger('web.login');
@@ -121,10 +122,7 @@ const LoginPage: React.FC = () => {
   };
 
   const handleGuestLogin = async () => {
-    await login(
-      gmp.settings.guestUsername ?? 'guest',
-      gmp.settings.guestPassword ?? 'guest',
-    );
+    await login(AUTO_LOGIN_USERNAME, AUTO_LOGIN_PASSWORD);
   };
 
   useEffect(() => {
