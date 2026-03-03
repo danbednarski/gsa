@@ -25,6 +25,7 @@ import {
   setIsLoggedIn,
   setSessionTimeout,
 } from 'web/store/usersettings/actions';
+import {AUTO_LOGIN_USERNAME, AUTO_LOGIN_PASSWORD} from 'web/autoLoginCredentials';
 
 void initLocale();
 const queryClient = new QueryClient();
@@ -45,13 +46,13 @@ const initStore = async () => {
   // Auto-login as admin if not already logged in
   if (!gmp.isLoggedIn()) {
     try {
-      const data = await gmp.login('admin', '吃错药了');
+      const data = await gmp.login(AUTO_LOGIN_USERNAME, AUTO_LOGIN_PASSWORD);
       const {locale, timezone, sessionTimeout} = data;
 
       gmp.setTimezone(timezone);
       gmp.setLocale(locale);
       store.dispatch(setSessionTimeout(sessionTimeout));
-      store.dispatch(setUsername('admin'));
+      store.dispatch(setUsername(AUTO_LOGIN_USERNAME));
       store.dispatch(setTimezone(timezone));
       store.dispatch(setIsLoggedIn(true));
     } catch (error) {

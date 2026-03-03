@@ -8,15 +8,22 @@ import {useDispatch} from 'react-redux';
 import useGmp from 'web/hooks/useGmp';
 import {renewSessionTimeout} from 'web/store/usersettings/actions';
 
-/**
- * Hook that automatically tracks user activity to renew the session timeout.
- * It listens for user interactions like clicks on buttons or links
- * and dispatches an action to renew the session timeout.
- * It also implements a cooldown period to prevent excessive renewals.
- * The cooldown lasts for 10 seconds after a user activity.
- * If the user interacts with the page during this cooldown, the session renewal is ignored.
- */
+// Renew session every 4 minutes to prevent server-side expiry (~15 min default)
+const KEEPALIVE_INTERVAL_MS = 4 * 60 * 1000;
 
+// Cooldown between user-activity-triggered renewals
+const ACTIVITY_COOLDOWN_MS = 10_000;
+
+/**
+ * Hook that keeps the GMP session alive. Uses three strategies:
+ *
+ * 1. Periodic background keepalive (every 4 min) — prevents expiry even
+ *    when the user is passively reading.
+ * 2. User-activity-triggered renewal (clicks, keypress, wheel, drag) with
+ *    a 10-second cooldown to avoid spamming the server.
+ * 3. Visibility-change renewal — immediately renews when the tab regains
+ *    focus (e.g. after laptop sleep/wake).
+ */
 const useSessionTracker = () => {
   const dispatch = useDispatch();
   const gmp = useGmp();
@@ -27,8 +34,13 @@ const useSessionTracker = () => {
   }, [dispatch, gmp]);
 
   useEffect(() => {
+    // Renew immediately on mount
     renewSession();
 
+    // --- 1. Background keepalive ---
+    const keepaliveId = setInterval(renewSession, KEEPALIVE_INTERVAL_MS);
+
+    // --- 2. User-activity-triggered renewal with cooldown ---
     let isCooldown = false;
     let cooldownTimeoutId: ReturnType<typeof setTimeout>;
 
@@ -38,37 +50,29 @@ const useSessionTracker = () => {
       isCooldown = true;
       cooldownTimeoutId = setTimeout(() => {
         isCooldown = false;
-      }, 10000);
+      }, ACTIVITY_COOLDOWN_MS);
     };
 
-    const handleClick = (event: MouseEvent | KeyboardEvent) => {
-      if (isCooldown) return;
-      if (!(event instanceof MouseEvent)) return;
-      const path = event.composedPath?.() || [];
-      const found = path.find(
-        (el: EventTarget) =>
-          el instanceof HTMLElement &&
-          (el.tagName === 'BUTTON' || el.tagName === 'A'),
-      );
-      if (found) {
-        handleUserActivity();
-      }
-    };
-
-    const events = ['keypress', 'wheel', 'drag'];
-
-    events.forEach(event => {
+    const activityEvents = ['click', 'keypress', 'wheel', 'drag'];
+    activityEvents.forEach(event => {
       window.addEventListener(event, handleUserActivity);
     });
-    window.addEventListener('click', handleClick);
+
+    // --- 3. Visibility-change renewal (tab focus / laptop wake) ---
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        renewSession();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
-      events.forEach(event => {
+      clearInterval(keepaliveId);
+      clearTimeout(cooldownTimeoutId);
+      activityEvents.forEach(event => {
         window.removeEventListener(event, handleUserActivity);
       });
-      window.removeEventListener('click', handleClick);
-      clearTimeout(cooldownTimeoutId);
-      isCooldown = false;
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [renewSession]);
 
